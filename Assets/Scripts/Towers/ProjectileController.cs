@@ -6,10 +6,12 @@ public class ProjectileController : MonoBehaviour
 
     private Transform target;
     private float lifetime;
+    private ObjectPool pool;
 
-    public void Init(Transform targetTransform)
+    public void Init(Transform targetTransform, ObjectPool poolRef)
     {
         target = targetTransform;
+        pool = poolRef;
         lifetime = data.maxLifetime;
     }
 
@@ -17,21 +19,21 @@ public class ProjectileController : MonoBehaviour
     {
         if (target == null)
         {
-            Destroy(gameObject);
+            Release();
             return;
         }
 
         lifetime -= Time.deltaTime;
         if (lifetime <= 0f)
         {
-            Destroy(gameObject);
+            Release();
             return;
         }
 
-        MoveTowardsTarget();
+        Move();
     }
 
-    void MoveTowardsTarget()
+    void Move()
     {
         Vector2 direction = (target.position - transform.position).normalized;
         transform.position += (Vector3)(direction * data.speed * Time.deltaTime);
@@ -47,7 +49,12 @@ public class ProjectileController : MonoBehaviour
                 health.TakeDamage(data.damage);
             }
 
-            Destroy(gameObject);
+            Release();
         }
+    }
+
+    void Release()
+    {
+        pool.Release(gameObject);
     }
 }

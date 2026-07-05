@@ -41,14 +41,13 @@ public class TowerController : MonoBehaviour
 
     void Shoot(Transform target)
     {
-        GameObject projectileGO = Instantiate(
-            data.projectilePrefab,
-            firePoint.position,
-            Quaternion.identity
-        );
+        ObjectPool pool = PoolManager.Instance.GetPool(data.projectilePrefab,10);
+
+        GameObject projectileGO = pool.Get();
+        projectileGO.transform.position = firePoint.position;
 
         ProjectileController projectile = projectileGO.GetComponent<ProjectileController>();
-        projectile.Init(target);
+        projectile.Init(target,pool);
 
     }
 
