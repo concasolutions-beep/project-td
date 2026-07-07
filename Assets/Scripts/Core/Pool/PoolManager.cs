@@ -3,14 +3,34 @@ using System.Collections.Generic;
 
 public class PoolManager : MonoBehaviour
 {
-
-    public static PoolManager Instance;
+    private static PoolManager instance;
+    public static PoolManager Instance
+    {
+        get
+        {
+            if (instance == null)
+            {
+                instance = FindFirstObjectByType<PoolManager>();
+                if (instance == null)
+                {
+                    GameObject go = new GameObject("PoolManager");
+                    instance = go.AddComponent<PoolManager>();
+                }
+            }
+            return instance;
+        }
+    }
 
     private Dictionary<GameObject, ObjectPool> pools = new Dictionary<GameObject, ObjectPool>();
 
     void Awake()
     {
-        Instance = this;
+        if (instance != null && instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        instance = this;
     }
 
     public ObjectPool GetPool(GameObject prefab, int size = 10)
