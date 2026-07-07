@@ -41,6 +41,14 @@ public class EnemyMovement : MonoBehaviour
         }
     }
 
+    void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Base"))
+        {
+            Destroy(gameObject);
+        }
+    }
+
     // Distanza rimanente lungo il percorso fino all'ultimo waypoint (usata per il targeting delle torrette)
     public float GetRemainingDistance()
     {
