@@ -7,6 +7,7 @@ public class TowerController : MonoBehaviour
 
     private float fireCountdown = 0f;
     private float effectiveRange;
+    private Transform currentTarget;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -26,17 +27,30 @@ public class TowerController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Transform target = FindClosestEnemy();
-        if (target == null)
+        if (!IsTargetValid(currentTarget))
+        {
+            currentTarget = FindClosestEnemy();
+        }
+
+        if (currentTarget == null)
             return;
 
         if (fireCountdown <= 0f)
         {
-            Shoot(target);
+            Shoot(currentTarget);
             fireCountdown = 1f / data.fireRate;
         }
 
         fireCountdown -= Time.deltaTime;
+    }
+
+    bool IsTargetValid(Transform target)
+    {
+        if (target == null)
+            return false;
+
+        float distance = Vector2.Distance(transform.position, target.position);
+        return distance <= effectiveRange;
     }
 
     Transform FindClosestEnemy()
@@ -44,17 +58,21 @@ public class TowerController : MonoBehaviour
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, effectiveRange);
 
         Transform closest = null;
-        float closestDistance = float.MaxValue;
+        float closestRemainingDistance = float.MaxValue;
 
         foreach (Collider2D hit in hits)
         {
             if (!hit.CompareTag("Enemy"))
                 continue;
 
-            float distance = Vector2.Distance(transform.position, hit.transform.position);
-            if (distance < closestDistance)
+            EnemyMovement movement = hit.GetComponent<EnemyMovement>();
+            float remainingDistance = movement != null
+                ? movement.GetRemainingDistance()
+                : Vector2.Distance(transform.position, hit.transform.position);
+
+            if (remainingDistance < closestRemainingDistance)
             {
-                closestDistance = distance;
+                closestRemainingDistance = remainingDistance;
                 closest = hit.transform;
             }
         }

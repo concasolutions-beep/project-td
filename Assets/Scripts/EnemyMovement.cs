@@ -40,4 +40,19 @@ public class EnemyMovement : MonoBehaviour
             currentIndex++;
         }
     }
+
+    // Distanza rimanente lungo il percorso fino all'ultimo waypoint (usata per il targeting delle torrette)
+    public float GetRemainingDistance()
+    {
+        if (waypoints == null || currentIndex >= waypoints.Length)
+            return 0f;
+
+        float distance = Vector2.Distance(transform.position, waypoints[currentIndex].position);
+        for (int i = currentIndex; i < waypoints.Length - 1; i++)
+        {
+            distance += Vector2.Distance(waypoints[i].position, waypoints[i + 1].position);
+        }
+
+        return distance;
+    }
 }
