@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6689d2c1f2a1e0f4481d840c16741883, type: 3}
   m_Name: Bullet_Basic
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileData
-  speed: 10
+  speed: 20
   damage: 1
   maxLifetime: 5

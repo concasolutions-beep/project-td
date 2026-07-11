@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tower_Basic
   m_EditorClassIdentifier: Assembly-CSharp::TowerData
   range: 5
-  fireRate: 1
+  fireRate: 2
   damage: 1
   projectilePrefab: {fileID: 1671291292893803643, guid: 454857fd8b2fdaa4cb39a4e5b7385c39, type: 3}
   towerName: Base
