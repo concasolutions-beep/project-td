@@ -4,7 +4,7 @@ using System;
 public class HealthController : MonoBehaviour
 {
 
-    public float maxHealth = 5f;
+    private float maxHealth = 5f;
     private float currentHealth;
     private bool isDead;
 
@@ -59,5 +59,18 @@ public class HealthController : MonoBehaviour
         OnDied?.Invoke();
         Debug.Log(gameObject.name + " morto cuppato");
         Destroy(gameObject);
+    }
+
+    public void SetMaxHealth(float value)
+    {
+        maxHealth = Mathf.Max(0f, value);
+
+        if (isDead)
+        {
+            return;
+        }
+
+        currentHealth = maxHealth;
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 }

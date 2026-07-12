@@ -1,13 +1,17 @@
 using UnityEngine;
+using System;
 
 public class EnemyMovement : MonoBehaviour
 {
     [Header("Percorso")]
     public Transform waypointsParent;
-    public float speed = 3f;            // velocità di movimento
+    private float speed = 3f;            // velocità di movimento
 
     private Transform[] waypoints;
     private int currentIndex = 0;
+    private bool hasReachedBase;
+
+    public event Action<EnemyMovement> OnReachedBase;
 
     void Start()
     {
@@ -43,8 +47,15 @@ public class EnemyMovement : MonoBehaviour
 
     void OnTriggerEnter2D(Collider2D other)
     {
+        if (hasReachedBase)
+        {
+            return;
+        }
+
         if (other.CompareTag("Base"))
         {
+            hasReachedBase = true;
+            OnReachedBase?.Invoke(this);
             Destroy(gameObject);
         }
     }
@@ -62,5 +73,10 @@ public class EnemyMovement : MonoBehaviour
         }
 
         return distance;
+    }
+
+    public void SetSpeed(float value)
+    {
+        speed = value;
     }
 }

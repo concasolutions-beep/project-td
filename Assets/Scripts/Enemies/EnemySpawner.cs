@@ -1,37 +1,81 @@
 using UnityEngine;
 using System.Collections;
+using System;
 
 public class EnemySpawner : MonoBehaviour
 {
     [Header("Riferimenti")]
+    [Tooltip("Prefab fallback usato se EnemyData.prefab non e' assegnato")]
     public GameObject enemyPrefab;
     public Transform waypointsParent;
 
-    [Header("Impostazioni ondata")]
-    public int enemyCount = 5;
-    public float spawnInterval = 1f;
-
-    void Start()
+    public IEnumerator SpawnWave(WaveData waveData, Action<GameObject> onEnemySpawned = null)
     {
-        StartCoroutine(SpawnWave());
-    }
-
-    IEnumerator SpawnWave()
-    {
-        for (int i = 0; i < enemyCount; i++)
+        if (waveData == null)
         {
-            SpawnEnemy();
-            yield return new WaitForSeconds(spawnInterval);
+            Debug.LogWarning("EnemySpawner: WaveData mancante.");
+            yield break;
+        }
+
+        if (waypointsParent == null || waypointsParent.childCount == 0)
+        {
+            Debug.LogWarning("EnemySpawner: waypointsParent non assegnato o vuoto.");
+            yield break;
+        }
+
+        if (waveData.enemies == null || waveData.enemies.Length == 0)
+        {
+            yield break;
+        }
+
+        for (int i = 0; i < waveData.enemies.Length; i++)
+        {
+            WaveData.EnemySpawnInfo spawnInfo = waveData.enemies[i];
+            if (spawnInfo == null || spawnInfo.enemy == null)
+            {
+                Debug.LogWarning("EnemySpawner: entry wave senza EnemyData, skip.");
+                continue;
+            }
+
+            int count = Mathf.Max(0, spawnInfo.count);
+            float delay = Mathf.Max(0f, spawnInfo.spawnDelay);
+
+            for (int c = 0; c < count; c++)
+            {
+                SpawnEnemy(spawnInfo.enemy, onEnemySpawned);
+                if (delay > 0f)
+                {
+                    yield return new WaitForSeconds(delay);
+                }
+            }
         }
     }
 
-    void SpawnEnemy()
+    private void SpawnEnemy(EnemyData enemyData, Action<GameObject> onEnemySpawned)
     {
         Vector3 startPos = waypointsParent.GetChild(0).position;
+        GameObject prefabToSpawn = enemyData.prefab != null ? enemyData.prefab : enemyPrefab;
 
-        GameObject enemy = Instantiate(enemyPrefab, startPos, Quaternion.identity);
+        if (prefabToSpawn == null)
+        {
+            Debug.LogWarning("EnemySpawner: prefab nemico mancante.");
+            return;
+        }
+
+        GameObject enemy = Instantiate(prefabToSpawn, startPos, Quaternion.identity);
+
+        EnemyController enemyController = enemy.GetComponent<EnemyController>();
+        if (enemyController != null)
+        {
+            enemyController.SetData(enemyData);
+        }
 
         EnemyMovement movement = enemy.GetComponent<EnemyMovement>();
-        movement.waypointsParent = waypointsParent;
+        if (movement != null)
+        {
+            movement.waypointsParent = waypointsParent;
+        }
+
+        onEnemySpawned?.Invoke(enemy);
     }
 }
