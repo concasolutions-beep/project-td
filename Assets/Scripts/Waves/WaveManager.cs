@@ -17,6 +17,7 @@ public class WaveManager : MonoBehaviour
     public event Action OnAllWavesCompleted;
 
     public int CurrentWaveIndex => currentWaveIndex;
+    public int TotalWaves => waveGroupData != null && waveGroupData.waves != null ? waveGroupData.waves.Length : 0;
     public int AliveEnemies => aliveEnemyIds.Count;
     public bool IsSpawningWave => isSpawningWave;
 
