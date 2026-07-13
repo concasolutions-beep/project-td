@@ -55,24 +55,24 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y brotli
 
-          cd build/WebGL/WebGL
+          find build/WebGL/WebGL -name '*.br' -print0 | xargs -0 -r -n1 brotli -d -f
 
-          for file in *.br; do
-            brotli -d "$file"
-          done
-
-          rm *.br
+          find build/WebGL/WebGL -name '*.br' -delete
 
       - name: Fix file references
         run: |
           cd build/WebGL/WebGL
 
-          sed -i 's/.js.br/.js/g' *.js
-          sed -i 's/.wasm.br/.wasm/g' *.js
-          sed -i 's/.data.br/.data/g' *.js
-          sed -i 's/.js.br/.js/g' index.html
-          sed -i 's/.wasm.br/.wasm/g' index.html
-          sed -i 's/.data.br/.data/g' index.html
+          find . -name '*.js' -print0 | xargs -0 sed -i \
+            -e 's/\.js\.br/.js/g' \
+            -e 's/\.wasm\.br/.wasm/g' \
+            -e 's/\.data\.br/.data/g'
+
+          sed -i \
+            -e 's/\.js\.br/.js/g' \
+            -e 's/\.wasm\.br/.wasm/g' \
+            -e 's/\.data\.br/.data/g' \
+            index.html
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
