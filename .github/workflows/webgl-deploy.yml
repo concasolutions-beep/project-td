@@ -12,6 +12,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 60
     permissions:
       contents: read
       id-token: write
@@ -48,7 +49,7 @@ jobs:
           UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
         with:
           targetPlatform: WebGL
-          unityVersion: 6000.3.11f1
+          unityVersion: 2022.3.20f1
 
       - name: Decompress Brotli files
         run: |
