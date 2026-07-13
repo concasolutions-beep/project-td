@@ -50,6 +50,9 @@ jobs:
           targetPlatform: WebGL
           unityVersion: 6000.3.11f1
 
+      - name: Fix build output ownership
+        run: sudo chown -R "$(id -u):$(id -g)" build
+
       - name: Decompress Brotli files
         run: |
           sudo apt-get update
