@@ -7,6 +7,7 @@ public class GroundPlusButtonSpawner : MonoBehaviour
 {
     [SerializeField] private Tilemap ground;
     [SerializeField] private Tilemap path;
+    [SerializeField] private Tilemap obstacles;
     [SerializeField] private GroundPlusButton buttonPrefab;
     [SerializeField] private GameObject towerPrefab;
     [SerializeField] private Transform container;
@@ -27,8 +28,6 @@ public class GroundPlusButtonSpawner : MonoBehaviour
         GameObject eventSystem = new GameObject("EventSystem");
         eventSystem.AddComponent<EventSystem>();
         eventSystem.AddComponent<InputSystemUIInputModule>();
-
-        Debug.Log("[GroundPlusButtonSpawner] No EventSystem found, created one.");
     }
 
     private void SpawnButtons()
@@ -42,7 +41,6 @@ public class GroundPlusButtonSpawner : MonoBehaviour
         Transform parent = container != null ? container : transform;
         BoundsInt bounds = ground.cellBounds;
 
-        Debug.Log($"[GroundPlusButtonSpawner] Scanning cellBounds {bounds} on '{ground.name}' (parent: '{parent.name}').");
 
         int spawned = 0;
 
@@ -52,7 +50,9 @@ public class GroundPlusButtonSpawner : MonoBehaviour
             {
                 Vector3Int cell = new Vector3Int(x, y, 0);
 
-                if (!ground.HasTile(cell) || path.HasTile(cell))
+                bool blocked = path.HasTile(cell) || (obstacles != null && obstacles.HasTile(cell));
+
+                if (!ground.HasTile(cell) || blocked)
                 {
                     continue;
                 }
@@ -64,7 +64,6 @@ public class GroundPlusButtonSpawner : MonoBehaviour
                 instance.Initialize(cell, HandleCellClicked);
                 spawned++;
 
-                Debug.Log($"[GroundPlusButtonSpawner] Spawned button #{spawned} at cell {cell} -> world {worldPos}.");
             }
         }
 
