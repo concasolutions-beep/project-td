@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 7365576342937885301}
   - component: {fileID: 4733214070059646983}
   - component: {fileID: 2550081232692139445}
+  - component: {fileID: 3954748492071099177}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -137,3 +138,18 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &3954748492071099177
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2912018848384068815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c5cff34ecd7f4d7c843306a4db129ef6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CameraExpandFit
+  referenceOrthographicSize: 5
+  referenceAspect: 1.8
+  uiTopReservedFraction: 0.101171
