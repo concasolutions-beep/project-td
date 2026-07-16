@@ -15,6 +15,8 @@ public class WaveManager : MonoBehaviour
     public event Action<int> OnWaveStarted;
     public event Action<int> OnWaveCompleted;
     public event Action OnAllWavesCompleted;
+    public event Action<EnemyData> OnEnemyKilled;
+    public event Action OnEnemyReachedBase;
 
     public int CurrentWaveIndex => currentWaveIndex;
     public int TotalWaves => waveGroupData != null && waveGroupData.waves != null ? waveGroupData.waves.Length : 0;
@@ -105,10 +107,17 @@ public class WaveManager : MonoBehaviour
             return;
         }
 
+        EnemyController controller = enemyObject.GetComponent<EnemyController>();
+        EnemyData enemyData = controller != null ? controller.data : null;
+
         HealthController health = enemyObject.GetComponent<HealthController>();
         if (health != null)
         {
-            health.OnDied += () => ResolveEnemy(id);
+            health.OnDied += () =>
+            {
+                ResolveEnemy(id);
+                OnEnemyKilled?.Invoke(enemyData);
+            };
         }
 
         EnemyMovement movement = enemyObject.GetComponent<EnemyMovement>();
@@ -127,6 +136,7 @@ public class WaveManager : MonoBehaviour
 
         movement.OnReachedBase -= HandleEnemyReachedBase;
         ResolveEnemy(movement.gameObject.GetInstanceID());
+        OnEnemyReachedBase?.Invoke();
     }
 
     private void ResolveEnemy(int enemyId)

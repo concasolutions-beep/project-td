@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ProjectileController : MonoBehaviour
 {
-    public ProjectileData data;
+    public TowerData data;
 
     private Transform target;
     private float lifetime;
