@@ -72,15 +72,22 @@ public class GroundPlusButtonSpawner : MonoBehaviour
 
     private void HandleCellClicked(GroundPlusButton button)
     {
-        if (towerPrefab != null)
-        {
-            Instantiate(towerPrefab, ground.GetCellCenterWorld(button.Cell), Quaternion.identity);
-        }
-        else
+        if (towerPrefab == null)
         {
             Debug.LogWarning("[GroundPlusButtonSpawner] No towerPrefab assigned, skipping placement.");
+            return;
         }
 
+        TowerController towerController = towerPrefab.GetComponent<TowerController>();
+        int cost = towerController != null && towerController.data != null ? towerController.data.cost : 0;
+
+        if (GameManager.Instance != null && !GameManager.Instance.TrySpendGold(cost))
+        {
+            Debug.Log("[GroundPlusButtonSpawner] Gold insufficiente per piazzare la torre.");
+            return;
+        }
+
+        Instantiate(towerPrefab, ground.GetCellCenterWorld(button.Cell), Quaternion.identity);
         Destroy(button.gameObject);
 
         Debug.Log($"[GroundPlusButtonSpawner] Tower placed on cell {button.Cell}.");
