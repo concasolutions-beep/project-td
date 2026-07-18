@@ -56,6 +56,11 @@ public class EnemyMovement : MonoBehaviour
         {
             hasReachedBase = true;
             OnReachedBase?.Invoke(this);
+            HealthController health = other.GetComponent<HealthController>();
+            if (health != null)
+            {
+                health.TakeDamage(1);
+            }
             Destroy(gameObject);
         }
     }
