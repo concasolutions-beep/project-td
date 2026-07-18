@@ -1,0 +1,97 @@
+name: Build WebGL and deploy to GitHub Pages
+
+on:
+  push:
+    branches: [master]
+  workflow_dispatch:
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Free Disk Space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          swap-storage: true
+          docker-images: false
+
+      - name: Checkout (with LFS)
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Cache Library
+        uses: actions/cache@v4
+        with:
+          path: Library
+          key: Library-WebGL-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          restore-keys: |
+            Library-WebGL-
+
+      - name: Build WebGL
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+          UNITY_EMAIL: ${{ secrets.UNITY_EMAIL }}
+          UNITY_PASSWORD: ${{ secrets.UNITY_PASSWORD }}
+        with:
+          targetPlatform: WebGL
+          unityVersion: 6000.3.11f1
+
+      - name: Fix build output ownership
+        run: sudo chown -R "$(id -u):$(id -g)" build
+
+      - name: Decompress Brotli files
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y brotli
+
+          find build/WebGL/WebGL -name '*.br' -print0 | xargs -0 -r -n1 brotli -d -f
+
+          find build/WebGL/WebGL -name '*.br' -delete
+
+      - name: Fix file references
+        run: |
+          cd build/WebGL/WebGL
+
+          find . -name '*.js' -print0 | xargs -0 sed -i \
+            -e 's/\.js\.br/.js/g' \
+            -e 's/\.wasm\.br/.wasm/g' \
+            -e 's/\.data\.br/.data/g'
+
+          sed -i \
+            -e 's/\.js\.br/.js/g' \
+            -e 's/\.wasm\.br/.wasm/g' \
+            -e 's/\.data\.br/.data/g' \
+            index.html
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: build/WebGL/WebGL
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
