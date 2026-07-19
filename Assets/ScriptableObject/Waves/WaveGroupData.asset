@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: WaveGroupData
   m_EditorClassIdentifier: Assembly-CSharp::WaveGroupData
   waves:
-  - {fileID: 11400000, guid: 146418abfaac6cd4eba0733ac468ba92, type: 2}
   - {fileID: 11400000, guid: 415c40039895d59458deb0c659f1d663, type: 2}
   - {fileID: 11400000, guid: d25074f3e151fa443b06ebd66a331a27, type: 2}
+  - {fileID: 11400000, guid: 146418abfaac6cd4eba0733ac468ba92, type: 2}
   delayBetweenWaves: 2
