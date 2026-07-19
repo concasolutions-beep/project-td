@@ -131,14 +131,14 @@ public class GameManager : MonoBehaviour
         AddGold(data.gold);
     }
 
-    private void HandleEnemyReachedBase()
+    private void HandleEnemyReachedBase(EnemyData data)
     {
         if (CurrentState != GameState.Playing)
         {
             return;
         }
 
-        Lives = Mathf.Max(0, Lives - 1);
+        Lives = Mathf.Max(0, Lives - data.damage);
         OnLivesChanged?.Invoke(Lives);
 
         if (Lives <= 0)

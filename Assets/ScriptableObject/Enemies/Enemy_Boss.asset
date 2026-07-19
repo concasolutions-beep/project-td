@@ -15,5 +15,6 @@ MonoBehaviour:
   prefab: {fileID: 608459771733721898, guid: ae12b3766581b5d4babc633978c8e6d5, type: 3}
   maxHealth: 20
   speed: 2
+  damage: 1
   gold: 5
   enemyName: bob
