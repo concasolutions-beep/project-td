@@ -59,7 +59,7 @@ public class EnemyMovement : MonoBehaviour
             HealthController health = other.GetComponent<HealthController>();
             if (health != null)
             {
-                health.TakeDamage(1);
+                //health.TakeDamage(1);
             }
             Destroy(gameObject);
         }
