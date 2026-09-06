@@ -84,7 +84,7 @@ public class TowerController : MonoBehaviour
     {
         Debug.Log($"[TowerController] {name} shooting at {target.name}");
 
-        ObjectPool pool = PoolManager.Instance.GetPool(data.projectilePrefab, 10);
+        ObjectPool pool = PoolManager.Instance.GetPool(data.projectileData.projectilePrefab, 10);
 
         GameObject projectileGO = pool.Get();
         projectileGO.transform.position = firePoint.position;

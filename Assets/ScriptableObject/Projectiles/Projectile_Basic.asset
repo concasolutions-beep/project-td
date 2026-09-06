@@ -9,9 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6689d2c1f2a1e0f4481d840c16741883, type: 3}
-  m_Name: Bullet_Basic
+  m_Script: {fileID: 11500000, guid: 519cd7ecd640faa4ab8066f68c3811bc, type: 3}
+  m_Name: Projectile_Basic
   m_EditorClassIdentifier: Assembly-CSharp::ProjectileData
-  speed: 20
+  projectilePrefab: {fileID: 1671291292893803643, guid: 454857fd8b2fdaa4cb39a4e5b7385c39, type: 3}
+  speed: 10
   damage: 1
   maxLifetime: 5
