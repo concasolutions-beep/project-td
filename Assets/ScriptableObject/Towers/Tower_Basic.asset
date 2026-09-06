@@ -14,9 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TowerData
   range: 5
   fireRate: 2
-  projectilePrefab: {fileID: 1671291292893803643, guid: 454857fd8b2fdaa4cb39a4e5b7385c39, type: 3}
-  speed: 10
-  damage: 1
-  maxLifetime: 5
+  projectileData: {fileID: 11400000, guid: f39149a1c0ba8ff4896d77cd6c93bfe5, type: 2}
   towerName: Base
   cost: 20
