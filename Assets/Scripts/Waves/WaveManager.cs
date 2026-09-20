@@ -57,6 +57,7 @@ public class WaveManager : MonoBehaviour
         }
 
         runStarted = true;
+        enemySpawner.WarmUp(waveGroupData);
         StartCoroutine(RunWavesRoutine());
     }
 
@@ -108,35 +109,28 @@ public class WaveManager : MonoBehaviour
         }
 
         EnemyController controller = enemyObject.GetComponent<EnemyController>();
-        EnemyData enemyData = controller != null ? controller.data : null;
-
-        HealthController health = enemyObject.GetComponent<HealthController>();
-        if (health != null)
+        if (controller == null)
         {
-            health.OnDied += () =>
-            {
-                ResolveEnemy(id);
-                OnEnemyKilled?.Invoke(enemyData);
-            };
-        }
-
-        EnemyMovement movement = enemyObject.GetComponent<EnemyMovement>();
-        if (movement != null)
-        {
-            movement.OnReachedBase += HandleEnemyReachedBase;
-        }
-    }
-
-    private void HandleEnemyReachedBase(EnemyMovement movement)
-    {
-        if (movement == null)
-        {
+            aliveEnemyIds.Remove(id);
             return;
         }
 
-        movement.OnReachedBase -= HandleEnemyReachedBase;
-        ResolveEnemy(movement.gameObject.GetInstanceID());
-        OnEnemyReachedBase?.Invoke(movement.GetComponent<EnemyController>()?.data);
+        controller.OnEnemyDespawned += HandleEnemyDespawned;
+    }
+
+    private void HandleEnemyDespawned(EnemyController controller, EnemyExitReason reason)
+    {
+        controller.OnEnemyDespawned -= HandleEnemyDespawned;
+        ResolveEnemy(controller.gameObject.GetInstanceID());
+
+        if (reason == EnemyExitReason.Killed)
+        {
+            OnEnemyKilled?.Invoke(controller.data);
+        }
+        else
+        {
+            OnEnemyReachedBase?.Invoke(controller.data);
+        }
     }
 
     private void ResolveEnemy(int enemyId)

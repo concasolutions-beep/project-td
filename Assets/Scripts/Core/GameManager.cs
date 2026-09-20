@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-public class GameManager : MonoBehaviour
+public class GameManager : Singleton<GameManager>
 {
     public enum GameState
     {
@@ -9,19 +9,6 @@ public class GameManager : MonoBehaviour
         Paused,
         GameOver,
         Victory
-    }
-
-    private static GameManager instance;
-    public static GameManager Instance
-    {
-        get
-        {
-            if (instance == null)
-            {
-                instance = FindFirstObjectByType<GameManager>();
-            }
-            return instance;
-        }
     }
 
     [Header("References")]
@@ -39,14 +26,13 @@ public class GameManager : MonoBehaviour
     public event Action<int> OnGoldChanged;
     public event Action<int> OnLivesChanged;
 
-    void Awake()
+    protected override void Awake()
     {
-        if (instance != null && instance != this)
+        base.Awake();
+        if (Instance != this)
         {
-            Destroy(gameObject);
             return;
         }
-        instance = this;
 
         Gold = startingGold;
         Lives = startingLives;

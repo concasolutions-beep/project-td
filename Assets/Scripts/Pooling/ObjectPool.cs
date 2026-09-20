@@ -35,11 +35,16 @@ public class ObjectPool
 
         GameObject obj = pool.Dequeue();
         obj.SetActive(true);
+
+        IPoolable poolable = obj.GetComponent<IPoolable>();
+        poolable?.Bind(this);
+        poolable?.OnSpawn();
         return obj;
     }
 
     public void Release(GameObject obj)
     {
+        obj.GetComponent<IPoolable>()?.OnDespawn();
         obj.SetActive(false);
         pool.Enqueue(obj);
     }
