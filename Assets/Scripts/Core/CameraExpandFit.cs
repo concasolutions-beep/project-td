@@ -39,6 +39,6 @@ public class CameraExpandFit : MonoBehaviour
             ? referenceOrthographicSize
             : referenceOrthographicSize * (referenceAspect / visibleAspect);
 
-        Debug.Log($"[CameraExpandFit] screen={lastScreenWidth}x{lastScreenHeight} screenAspect={screenAspect:F3} visibleAspect={visibleAspect:F3} orthoSize={targetCamera.orthographicSize:F3} rect={targetCamera.rect}");
+        Utils.DebugLog($"[CameraExpandFit] screen={lastScreenWidth}x{lastScreenHeight} screenAspect={screenAspect:F3} visibleAspect={visibleAspect:F3} orthoSize={targetCamera.orthographicSize:F3} rect={targetCamera.rect}");
     }
 }

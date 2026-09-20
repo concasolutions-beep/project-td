@@ -46,13 +46,13 @@ public class WaveManager : MonoBehaviour
 
         if (enemySpawner == null)
         {
-            Debug.LogWarning("WaveManager: EnemySpawner non assegnato.");
+            Utils.WarningLog("WaveManager: EnemySpawner non assegnato.");
             return;
         }
 
         if (waveGroupData == null || waveGroupData.waves == null || waveGroupData.waves.Length == 0)
         {
-            Debug.LogWarning("WaveManager: WaveGroupData mancante o vuoto.");
+            Utils.WarningLog("WaveManager: WaveGroupData mancante o vuoto.");
             return;
         }
 

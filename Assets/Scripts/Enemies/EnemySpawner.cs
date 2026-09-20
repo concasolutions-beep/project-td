@@ -13,13 +13,13 @@ public class EnemySpawner : MonoBehaviour
     {
         if (waveData == null)
         {
-            Debug.LogWarning("EnemySpawner: WaveData mancante.");
+            Utils.WarningLog("EnemySpawner: WaveData mancante.");
             yield break;
         }
 
         if (waypointsParent == null || waypointsParent.childCount == 0)
         {
-            Debug.LogWarning("EnemySpawner: waypointsParent non assegnato o vuoto.");
+            Utils.WarningLog("EnemySpawner: waypointsParent non assegnato o vuoto.");
             yield break;
         }
 
@@ -33,7 +33,7 @@ public class EnemySpawner : MonoBehaviour
             WaveData.EnemySpawnInfo spawnInfo = waveData.enemies[i];
             if (spawnInfo == null || spawnInfo.enemy == null)
             {
-                Debug.LogWarning("EnemySpawner: entry wave senza EnemyData, skip.");
+                Utils.WarningLog("EnemySpawner: entry wave senza EnemyData, skip.");
                 continue;
             }
 
@@ -58,7 +58,7 @@ public class EnemySpawner : MonoBehaviour
 
         if (prefabToSpawn == null)
         {
-            Debug.LogWarning("EnemySpawner: prefab nemico mancante.");
+            Utils.WarningLog("EnemySpawner: prefab nemico mancante.");
             return;
         }
 
