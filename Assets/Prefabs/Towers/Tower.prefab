@@ -175,3 +175,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TowerController
   data: {fileID: 11400000, guid: 93fac70ed8ae9e04cb96c575c5c73db7, type: 2}
   firePoint: {fileID: 6821994405351703914}
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 8
