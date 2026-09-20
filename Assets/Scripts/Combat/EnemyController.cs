@@ -1,23 +1,14 @@
 using System;
 using UnityEngine;
 
-//Controller per centralizzare script nemici
 [RequireComponent(typeof(HealthController))]
 [RequireComponent(typeof(EnemyMovement))]
-public class EnemyController : MonoBehaviour, IPoolable
+public class EnemyController : PoolableEntity
 {
-
     public EnemyData data;
     private HealthController health;
     private EnemyMovement movement;
-    private GameObject sourcePrefab;
-    private bool isDespawning;
     public event Action<EnemyController, EnemyExitReason> OnEnemyDespawned;
-
-    public void SetSourcePrefab(GameObject prefab)
-    {
-        sourcePrefab = prefab;
-    }
 
     void Awake()
     {
@@ -38,7 +29,6 @@ public class EnemyController : MonoBehaviour, IPoolable
             return;
         }
 
-
         health.SetMaxHealth(data.maxHealth);
         movement.SetSpeed(data.speed);
     }
@@ -49,16 +39,15 @@ public class EnemyController : MonoBehaviour, IPoolable
         Init();
     }
 
-    public void OnSpawn()
+    protected override void OnSpawned()
     {
-        isDespawning = false;
         health.ResetHealth();
         health.OnDied += HandleDied;
     }
 
-    public void OnDespawn()
+    protected override void OnDespawned()
     {
-        health.ClearSubscribers();
+        health.OnDied -= HandleDied;
         OnEnemyDespawned = null;
     }
 
@@ -74,22 +63,13 @@ public class EnemyController : MonoBehaviour, IPoolable
 
     private void Despawn(EnemyExitReason reason)
     {
-        if (isDespawning)
+        if (IsReleased)
         {
             return;
         }
 
-        isDespawning = true;
         OnEnemyDespawned?.Invoke(this, reason);
-
-        if (sourcePrefab != null)
-        {
-            PoolManager.Instance.GetPool(sourcePrefab).Release(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        ReleaseToPool();
     }
 }
 

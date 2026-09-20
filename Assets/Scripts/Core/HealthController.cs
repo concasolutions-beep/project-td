@@ -29,13 +29,6 @@ public class HealthController : MonoBehaviour
         OnHealthChanged?.Invoke(currentHealth, maxHealth);
     }
 
-    public void ClearSubscribers()
-    {
-        OnHealthChanged = null;
-        OnDamaged = null;
-        OnDied = null;
-    }
-
     public void TakeDamage(float amount)
     {
         if (isDead || amount <= 0f)
@@ -70,11 +63,6 @@ public class HealthController : MonoBehaviour
 
         isDead = true;
         OnDied?.Invoke();
-        Utils.DebugLog(gameObject.name + " morto cuppato");
-        if (GetComponent<IPoolable>() == null)
-        {
-            Destroy(gameObject);
-        }
     }
 
     public void SetMaxHealth(float value)

@@ -35,7 +35,10 @@ public class ObjectPool
 
         GameObject obj = pool.Dequeue();
         obj.SetActive(true);
-        obj.GetComponent<IPoolable>()?.OnSpawn();
+
+        IPoolable poolable = obj.GetComponent<IPoolable>();
+        poolable?.Bind(this);
+        poolable?.OnSpawn();
         return obj;
     }
 

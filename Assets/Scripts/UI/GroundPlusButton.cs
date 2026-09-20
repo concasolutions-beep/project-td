@@ -2,7 +2,7 @@ using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GroundPlusButton : MonoBehaviour
+public class GroundPlusButton : PoolableEntity
 {
     [SerializeField] private Button button;
 
@@ -19,19 +19,28 @@ public class GroundPlusButton : MonoBehaviour
     {
         Cell = cell;
         this.onClicked = onClicked;
+    }
 
+    public void Dismiss()
+    {
+        ReleaseToPool();
+    }
+
+    protected override void OnSpawned()
+    {
         if (button != null)
         {
             button.onClick.AddListener(HandleClick);
         }
     }
 
-    void OnDestroy()
+    protected override void OnDespawned()
     {
         if (button != null)
         {
             button.onClick.RemoveListener(HandleClick);
         }
+        onClicked = null;
     }
 
     private void HandleClick()

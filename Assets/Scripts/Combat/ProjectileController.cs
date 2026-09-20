@@ -1,31 +1,38 @@
 using UnityEngine;
 
-public class ProjectileController : MonoBehaviour
+public class ProjectileController : PoolableEntity
 {
     public ProjectileData data;
     private Transform target;
     private float lifetime;
-    private ObjectPool pool;
 
-    public void Init(Transform targetTransform, ObjectPool poolRef)
+    public void Init(Transform targetTransform)
     {
         target = targetTransform;
-        pool = poolRef;
         lifetime = data.maxLifetime;
+    }
+
+    protected override void OnSpawned()
+    {
+    }
+
+    protected override void OnDespawned()
+    {
+        target = null;
     }
 
     void Update()
     {
         if (target == null || !target.gameObject.activeInHierarchy)
         {
-            Release();
+            ReleaseToPool();
             return;
         }
 
         lifetime -= Time.deltaTime;
         if (lifetime <= 0f)
         {
-            Release();
+            ReleaseToPool();
             return;
         }
 
@@ -48,12 +55,7 @@ public class ProjectileController : MonoBehaviour
                 health.TakeDamage(data.damage);
             }
 
-            Release();
+            ReleaseToPool();
         }
-    }
-
-    void Release()
-    {
-        pool.Release(gameObject);
     }
 }

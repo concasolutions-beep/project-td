@@ -1,57 +1,34 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class PoolManager : MonoBehaviour
+public class PoolManager : Singleton<PoolManager>
 {
-    private static PoolManager instance;
-    public static PoolManager Instance
+    // A differenza di GameManager, PoolManager non e' mai piazzato a mano in scena:
+    // viene creato al volo alla prima richiesta.
+    public new static PoolManager Instance
     {
         get
         {
-            if (instance == null)
+            PoolManager found = Singleton<PoolManager>.Instance;
+            if (found == null)
             {
-                instance = FindFirstObjectByType<PoolManager>();
-                if (instance == null)
-                {
-                    GameObject go = new GameObject("PoolManager");
-                    instance = go.AddComponent<PoolManager>();
-                }
+                GameObject go = new GameObject(nameof(PoolManager));
+                found = go.AddComponent<PoolManager>();
             }
-            return instance;
+            return found;
         }
     }
 
-    private Dictionary<GameObject, ObjectPool> pools = new Dictionary<GameObject, ObjectPool>();
-
-    void Awake()
-    {
-        if (instance != null && instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        instance = this;
-    }
+    private readonly Dictionary<GameObject, ObjectPool> pools = new Dictionary<GameObject, ObjectPool>();
 
     public ObjectPool GetPool(GameObject prefab, int size = 10)
     {
-        if (!pools.ContainsKey(prefab))
+        if (!pools.TryGetValue(prefab, out ObjectPool pool))
         {
-            ObjectPool newPool = new ObjectPool(prefab, size, transform);
-            pools.Add(prefab, newPool);
+            pool = new ObjectPool(prefab, size, transform);
+            pools.Add(prefab, pool);
         }
 
-        return pools[prefab];
-    }
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
+        return pool;
     }
 }

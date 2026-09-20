@@ -124,7 +124,6 @@ public class EnemySpawner : MonoBehaviour
         EnemyController enemyController = enemy.GetComponent<EnemyController>();
         if (enemyController != null)
         {
-            enemyController.SetSourcePrefab(prefabToSpawn);
             enemyController.SetData(enemyData);
         }
 

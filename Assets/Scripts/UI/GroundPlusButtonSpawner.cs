@@ -59,8 +59,11 @@ public class GroundPlusButtonSpawner : MonoBehaviour
 
                 Vector3 worldPos = ground.GetCellCenterWorld(cell);
 
-                GroundPlusButton instance = Instantiate(buttonPrefab, parent);
-                instance.transform.position = worldPos;
+                GameObject buttonGO = PoolManager.Instance.GetPool(buttonPrefab.gameObject).Get();
+                buttonGO.transform.SetParent(parent);
+                buttonGO.transform.position = worldPos;
+
+                GroundPlusButton instance = buttonGO.GetComponent<GroundPlusButton>();
                 instance.Initialize(cell, HandleCellClicked);
                 spawned++;
 
@@ -87,8 +90,9 @@ public class GroundPlusButtonSpawner : MonoBehaviour
             return;
         }
 
-        Instantiate(towerPrefab, ground.GetCellCenterWorld(button.Cell), Quaternion.identity);
-        Destroy(button.gameObject);
+        GameObject towerGO = PoolManager.Instance.GetPool(towerPrefab).Get();
+        towerGO.transform.SetPositionAndRotation(ground.GetCellCenterWorld(button.Cell), Quaternion.identity);
+        button.Dismiss();
 
         Utils.DebugLog($"[GroundPlusButtonSpawner] Tower placed on cell {button.Cell}.");
     }
