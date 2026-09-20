@@ -1,17 +1,23 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class TowerController : MonoBehaviour
 {
     public TowerData data;
     public Transform firePoint;
+    public LayerMask enemyLayerMask;
 
     private float fireCountdown = 0f;
     private float effectiveRange;
     private Transform currentTarget;
+    private ContactFilter2D contactFilter;
+    private List<Collider2D> targetsBuffer = new List<Collider2D>();
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        contactFilter = new ContactFilter2D();
+        contactFilter.SetLayerMask(enemyLayerMask);
         // Set the collider radius based on the tower's range (used for range visualization/gizmos)
         CircleCollider2D col = GetComponent<CircleCollider2D>();
         if (col != null)
@@ -55,25 +61,23 @@ public class TowerController : MonoBehaviour
 
     Transform FindClosestEnemy()
     {
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, effectiveRange);
+        targetsBuffer.Clear();
+        Physics2D.OverlapCircle(transform.position, effectiveRange, contactFilter, targetsBuffer);
 
         Transform closest = null;
         float closestRemainingDistance = float.MaxValue;
 
-        foreach (Collider2D hit in hits)
+        foreach (Collider2D target in targetsBuffer)
         {
-            if (!hit.CompareTag("Enemy"))
-                continue;
-
-            EnemyMovement movement = hit.GetComponent<EnemyMovement>();
+            EnemyMovement movement = target.GetComponent<EnemyMovement>();
             float remainingDistance = movement != null
                 ? movement.GetRemainingDistance()
-                : Vector2.Distance(transform.position, hit.transform.position);
+                : Vector2.Distance(transform.position, target.transform.position);
 
             if (remainingDistance < closestRemainingDistance)
             {
                 closestRemainingDistance = remainingDistance;
-                closest = hit.transform;
+                closest = target.transform;
             }
         }
 
