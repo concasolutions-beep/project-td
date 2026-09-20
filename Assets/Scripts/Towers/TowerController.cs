@@ -27,7 +27,7 @@ public class TowerController : MonoBehaviour
 
         effectiveRange = data.range * Mathf.Abs(transform.lossyScale.x);
 
-        Debug.Log($"[TowerController] {name} started. Range: {data.range}, FireRate: {data.fireRate}");
+        Utils.DebugLog($"[TowerController] {name} started. Range: {data.range}, FireRate: {data.fireRate}");
     }
 
     // Update is called once per frame
@@ -86,7 +86,7 @@ public class TowerController : MonoBehaviour
 
     void Shoot(Transform target)
     {
-        Debug.Log($"[TowerController] {name} shooting at {target.name}");
+        Utils.DebugLog($"[TowerController] {name} shooting at {target.name}");
 
         ObjectPool pool = PoolManager.Instance.GetPool(data.projectileData.projectilePrefab, 10);
 

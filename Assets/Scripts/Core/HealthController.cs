@@ -57,7 +57,7 @@ public class HealthController : MonoBehaviour
 
         isDead = true;
         OnDied?.Invoke();
-        Debug.Log(gameObject.name + " morto cuppato");
+        Utils.DebugLog(gameObject.name + " morto cuppato");
         Destroy(gameObject);
     }
 

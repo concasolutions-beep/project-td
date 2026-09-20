@@ -34,7 +34,7 @@ public class GroundPlusButtonSpawner : MonoBehaviour
     {
         if (ground == null || path == null || buttonPrefab == null)
         {
-            Debug.LogWarning("[GroundPlusButtonSpawner] Missing references, skipping spawn.");
+            Utils.WarningLog("[GroundPlusButtonSpawner] Missing references, skipping spawn.");
             return;
         }
 
@@ -67,14 +67,14 @@ public class GroundPlusButtonSpawner : MonoBehaviour
             }
         }
 
-        Debug.Log($"[GroundPlusButtonSpawner] Done. Spawned {spawned} buttons.");
+        Utils.DebugLog($"[GroundPlusButtonSpawner] Done. Spawned {spawned} buttons.");
     }
 
     private void HandleCellClicked(GroundPlusButton button)
     {
         if (towerPrefab == null)
         {
-            Debug.LogWarning("[GroundPlusButtonSpawner] No towerPrefab assigned, skipping placement.");
+            Utils.WarningLog("[GroundPlusButtonSpawner] No towerPrefab assigned, skipping placement.");
             return;
         }
 
@@ -83,13 +83,13 @@ public class GroundPlusButtonSpawner : MonoBehaviour
 
         if (GameManager.Instance != null && !GameManager.Instance.TrySpendGold(cost))
         {
-            Debug.Log("[GroundPlusButtonSpawner] Gold insufficiente per piazzare la torre.");
+            Utils.DebugLog("[GroundPlusButtonSpawner] Gold insufficiente per piazzare la torre.");
             return;
         }
 
         Instantiate(towerPrefab, ground.GetCellCenterWorld(button.Cell), Quaternion.identity);
         Destroy(button.gameObject);
 
-        Debug.Log($"[GroundPlusButtonSpawner] Tower placed on cell {button.Cell}.");
+        Utils.DebugLog($"[GroundPlusButtonSpawner] Tower placed on cell {button.Cell}.");
     }
 }
