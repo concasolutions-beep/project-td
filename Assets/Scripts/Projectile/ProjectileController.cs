@@ -16,7 +16,7 @@ public class ProjectileController : MonoBehaviour
 
     void Update()
     {
-        if (target == null)
+        if (target == null || !target.gameObject.activeInHierarchy)
         {
             Release();
             return;

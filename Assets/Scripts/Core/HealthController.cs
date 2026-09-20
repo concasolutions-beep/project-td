@@ -18,9 +18,22 @@ public class HealthController : MonoBehaviour
 
     void Awake()
     {
+        ResetHealth();
+    }
+
+    public void ResetHealth()
+    {
         maxHealth = Mathf.Max(0f, maxHealth);
         currentHealth = maxHealth;
         isDead = false;
+        OnHealthChanged?.Invoke(currentHealth, maxHealth);
+    }
+
+    public void ClearSubscribers()
+    {
+        OnHealthChanged = null;
+        OnDamaged = null;
+        OnDied = null;
     }
 
     public void TakeDamage(float amount)
@@ -58,7 +71,10 @@ public class HealthController : MonoBehaviour
         isDead = true;
         OnDied?.Invoke();
         Utils.DebugLog(gameObject.name + " morto cuppato");
-        Destroy(gameObject);
+        if (GetComponent<IPoolable>() == null)
+        {
+            Destroy(gameObject);
+        }
     }
 
     public void SetMaxHealth(float value)

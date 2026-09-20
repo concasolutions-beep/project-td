@@ -52,7 +52,7 @@ public class TowerController : MonoBehaviour
 
     bool IsTargetValid(Transform target)
     {
-        if (target == null)
+        if (target == null || !target.gameObject.activeInHierarchy)
             return false;
 
         float distance = Vector2.Distance(transform.position, target.position);
