@@ -1,172 +1,163 @@
 using System;
 using UnityEngine;
+using ProjectTD.Enemy;
+using ProjectTD.Wave;
 
-public class GameManager : MonoBehaviour
+namespace ProjectTD.Core
 {
-    public enum GameState
+    public class GameManager : Singleton<GameManager>
     {
-        Playing,
-        Paused,
-        GameOver,
-        Victory
-    }
-
-    private static GameManager instance;
-    public static GameManager Instance
-    {
-        get
+        public enum GameState
         {
-            if (instance == null)
+            Playing,
+            Paused,
+            GameOver,
+            Victory
+        }
+
+        [Header("References")]
+        [SerializeField] private WaveManager waveManager;
+
+        [Header("Economy")]
+        [SerializeField] private int startingGold = 100;
+        [SerializeField] private int startingLives = 10;
+
+        public GameState CurrentState { get; private set; } = GameState.Playing;
+        public int Gold { get; private set; }
+        public int Lives { get; private set; }
+
+        public event Action<GameState> OnStateChanged;
+        public event Action<int> OnGoldChanged;
+        public event Action<int> OnLivesChanged;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            if (Instance != this)
             {
-                instance = FindFirstObjectByType<GameManager>();
+                return;
             }
-            return instance;
-        }
-    }
 
-    [Header("References")]
-    [SerializeField] private WaveManager waveManager;
-
-    [Header("Economy")]
-    [SerializeField] private int startingGold = 100;
-    [SerializeField] private int startingLives = 10;
-
-    public GameState CurrentState { get; private set; } = GameState.Playing;
-    public int Gold { get; private set; }
-    public int Lives { get; private set; }
-
-    public event Action<GameState> OnStateChanged;
-    public event Action<int> OnGoldChanged;
-    public event Action<int> OnLivesChanged;
-
-    void Awake()
-    {
-        if (instance != null && instance != this)
-        {
-            Destroy(gameObject);
-            return;
-        }
-        instance = this;
-
-        Gold = startingGold;
-        Lives = startingLives;
-    }
-
-    void OnEnable()
-    {
-        if (waveManager == null)
-        {
-            return;
+            Gold = startingGold;
+            Lives = startingLives;
         }
 
-        waveManager.OnEnemyKilled += HandleEnemyKilled;
-        waveManager.OnEnemyReachedBase += HandleEnemyReachedBase;
-        waveManager.OnAllWavesCompleted += HandleAllWavesCompleted;
-    }
-
-    void OnDisable()
-    {
-        if (waveManager == null)
+        void OnEnable()
         {
-            return;
+            if (waveManager == null)
+            {
+                return;
+            }
+
+            waveManager.OnEnemyKilled += HandleEnemyKilled;
+            waveManager.OnEnemyReachedBase += HandleEnemyReachedBase;
+            waveManager.OnAllWavesCompleted += HandleAllWavesCompleted;
         }
 
-        waveManager.OnEnemyKilled -= HandleEnemyKilled;
-        waveManager.OnEnemyReachedBase -= HandleEnemyReachedBase;
-        waveManager.OnAllWavesCompleted -= HandleAllWavesCompleted;
-    }
-
-    public bool TrySpendGold(int amount)
-    {
-        if (CurrentState != GameState.Playing || amount > Gold)
+        void OnDisable()
         {
-            return false;
+            if (waveManager == null)
+            {
+                return;
+            }
+
+            waveManager.OnEnemyKilled -= HandleEnemyKilled;
+            waveManager.OnEnemyReachedBase -= HandleEnemyReachedBase;
+            waveManager.OnAllWavesCompleted -= HandleAllWavesCompleted;
         }
 
-        Gold -= amount;
-        OnGoldChanged?.Invoke(Gold);
-        return true;
-    }
-
-    public void AddGold(int amount)
-    {
-        if (amount <= 0)
+        public bool TrySpendGold(int amount)
         {
-            return;
+            if (CurrentState != GameState.Playing || amount > Gold)
+            {
+                return false;
+            }
+
+            Gold -= amount;
+            OnGoldChanged?.Invoke(Gold);
+            return true;
         }
 
-        Gold += amount;
-        OnGoldChanged?.Invoke(Gold);
-    }
-
-    public void Pause()
-    {
-        if (CurrentState != GameState.Playing)
+        public void AddGold(int amount)
         {
-            return;
+            if (amount <= 0)
+            {
+                return;
+            }
+
+            Gold += amount;
+            OnGoldChanged?.Invoke(Gold);
         }
 
-        Time.timeScale = 0f;
-        SetState(GameState.Paused);
-    }
-
-    public void Resume()
-    {
-        if (CurrentState != GameState.Paused)
+        public void Pause()
         {
-            return;
-        }
+            if (CurrentState != GameState.Playing)
+            {
+                return;
+            }
 
-        Time.timeScale = 1f;
-        SetState(GameState.Playing);
-    }
-
-    private void HandleEnemyKilled(EnemyData data)
-    {
-        if (data == null)
-        {
-            return;
-        }
-
-        AddGold(data.gold);
-    }
-
-    private void HandleEnemyReachedBase(EnemyData data)
-    {
-        if (CurrentState != GameState.Playing)
-        {
-            return;
-        }
-
-        Lives = Mathf.Max(0, Lives - data.damage);
-        OnLivesChanged?.Invoke(Lives);
-
-        if (Lives <= 0)
-        {
             Time.timeScale = 0f;
-            SetState(GameState.GameOver);
+            SetState(GameState.Paused);
         }
-    }
 
-    private void HandleAllWavesCompleted()
-    {
-        if (CurrentState != GameState.Playing)
+        public void Resume()
         {
-            return;
+            if (CurrentState != GameState.Paused)
+            {
+                return;
+            }
+
+            Time.timeScale = 1f;
+            SetState(GameState.Playing);
         }
 
-        Time.timeScale = 0f;
-        SetState(GameState.Victory);
-    }
-
-    private void SetState(GameState newState)
-    {
-        if (CurrentState == newState)
+        private void HandleEnemyKilled(EnemyData data)
         {
-            return;
+            if (data == null)
+            {
+                return;
+            }
+
+            AddGold(data.gold);
         }
 
-        CurrentState = newState;
-        OnStateChanged?.Invoke(newState);
+        private void HandleEnemyReachedBase(EnemyData data)
+        {
+            if (CurrentState != GameState.Playing)
+            {
+                return;
+            }
+
+            Lives = Mathf.Max(0, Lives - data.damage);
+            OnLivesChanged?.Invoke(Lives);
+
+            if (Lives <= 0)
+            {
+                Time.timeScale = 0f;
+                SetState(GameState.GameOver);
+            }
+        }
+
+        private void HandleAllWavesCompleted()
+        {
+            if (CurrentState != GameState.Playing)
+            {
+                return;
+            }
+
+            Time.timeScale = 0f;
+            SetState(GameState.Victory);
+        }
+
+        private void SetState(GameState newState)
+        {
+            if (CurrentState == newState)
+            {
+                return;
+            }
+
+            CurrentState = newState;
+            OnStateChanged?.Invoke(newState);
+        }
     }
 }
