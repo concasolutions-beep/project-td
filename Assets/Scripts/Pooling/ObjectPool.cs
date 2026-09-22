@@ -1,51 +1,54 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ObjectPool
+namespace ProjectTD.Pooling
 {
-    private GameObject prefab;
-    private Queue<GameObject> pool = new Queue<GameObject>();
-    private Transform parent;
-
-    public ObjectPool(GameObject prefab, int initialSize, Transform parent = null)
+    public class ObjectPool
     {
-        this.prefab = prefab;
-        this.parent = parent;
+        private GameObject prefab;
+        private Queue<GameObject> pool = new Queue<GameObject>();
+        private Transform parent;
 
-        for (int i = 0; i < initialSize; i++)
+        public ObjectPool(GameObject prefab, int initialSize, Transform parent = null)
         {
-            CreateObject();
-        }
-    }
+            this.prefab = prefab;
+            this.parent = parent;
 
-    private GameObject CreateObject()
-    {
-        GameObject obj = GameObject.Instantiate(prefab, parent);
-        obj.SetActive(false);
-        pool.Enqueue(obj);
-        return obj;
-    }
-
-    public GameObject Get()
-    {
-        if (pool.Count == 0)
-        {
-            CreateObject();
+            for (int i = 0; i < initialSize; i++)
+            {
+                CreateObject();
+            }
         }
 
-        GameObject obj = pool.Dequeue();
-        obj.SetActive(true);
+        private GameObject CreateObject()
+        {
+            GameObject obj = GameObject.Instantiate(prefab, parent);
+            obj.SetActive(false);
+            pool.Enqueue(obj);
+            return obj;
+        }
 
-        IPoolable poolable = obj.GetComponent<IPoolable>();
-        poolable?.Bind(this);
-        poolable?.OnSpawn();
-        return obj;
-    }
+        public GameObject Get()
+        {
+            if (pool.Count == 0)
+            {
+                CreateObject();
+            }
 
-    public void Release(GameObject obj)
-    {
-        obj.GetComponent<IPoolable>()?.OnDespawn();
-        obj.SetActive(false);
-        pool.Enqueue(obj);
+            GameObject obj = pool.Dequeue();
+            obj.SetActive(true);
+
+            IPoolable poolable = obj.GetComponent<IPoolable>();
+            poolable?.Bind(this);
+            poolable?.OnSpawn();
+            return obj;
+        }
+
+        public void Release(GameObject obj)
+        {
+            obj.GetComponent<IPoolable>()?.OnDespawn();
+            obj.SetActive(false);
+            pool.Enqueue(obj);
+        }
     }
 }
