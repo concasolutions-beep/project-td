@@ -1,46 +1,49 @@
 using UnityEngine;
 
-public abstract class PoolableEntity : MonoBehaviour, IPoolable
+namespace ProjectTD.Pooling
 {
-    private ObjectPool ownerPool;
-    private bool isReleased;
-
-    protected bool IsReleased => isReleased;
-
-    public void Bind(ObjectPool pool)
+    public abstract class PoolableEntity : MonoBehaviour, IPoolable
     {
-        ownerPool = pool;
-    }
+        private ObjectPool ownerPool;
+        private bool isReleased;
 
-    public void OnSpawn()
-    {
-        isReleased = false;
-        OnSpawned();
-    }
+        protected bool IsReleased => isReleased;
 
-    public void OnDespawn()
-    {
-        OnDespawned();
-    }
-
-    protected void ReleaseToPool()
-    {
-        if (isReleased)
+        public void Bind(ObjectPool pool)
         {
-            return;
+            ownerPool = pool;
         }
-        isReleased = true;
 
-        if (ownerPool != null)
+        public void OnSpawn()
         {
-            ownerPool.Release(gameObject);
+            isReleased = false;
+            OnSpawned();
         }
-        else
+
+        public void OnDespawn()
         {
-            Destroy(gameObject);
+            OnDespawned();
         }
+
+        protected void ReleaseToPool()
+        {
+            if (isReleased)
+            {
+                return;
+            }
+            isReleased = true;
+
+            if (ownerPool != null)
+            {
+                ownerPool.Release(gameObject);
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        protected abstract void OnSpawned();
+        protected abstract void OnDespawned();
     }
-
-    protected abstract void OnSpawned();
-    protected abstract void OnDespawned();
 }

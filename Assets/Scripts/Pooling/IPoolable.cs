@@ -1,6 +1,9 @@
-public interface IPoolable
+namespace ProjectTD.Pooling
 {
-    void Bind(ObjectPool pool);
-    void OnSpawn();
-    void OnDespawn();
+    public interface IPoolable
+    {
+        void Bind(ObjectPool pool);
+        void OnSpawn();
+        void OnDespawn();
+    }
 }

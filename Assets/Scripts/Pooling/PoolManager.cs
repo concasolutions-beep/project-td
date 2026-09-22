@@ -1,34 +1,38 @@
 using UnityEngine;
 using System.Collections.Generic;
+using ProjectTD.Core;
 
-public class PoolManager : Singleton<PoolManager>
+namespace ProjectTD.Pooling
 {
-    // A differenza di GameManager, PoolManager non e' mai piazzato a mano in scena:
-    // viene creato al volo alla prima richiesta.
-    public new static PoolManager Instance
+    public class PoolManager : Singleton<PoolManager>
     {
-        get
+        // A differenza di GameManager, PoolManager non e' mai piazzato a mano in scena:
+        // viene creato al volo alla prima richiesta.
+        public new static PoolManager Instance
         {
-            PoolManager found = Singleton<PoolManager>.Instance;
-            if (found == null)
+            get
             {
-                GameObject go = new GameObject(nameof(PoolManager));
-                found = go.AddComponent<PoolManager>();
+                PoolManager found = Singleton<PoolManager>.Instance;
+                if (found == null)
+                {
+                    GameObject go = new GameObject(nameof(PoolManager));
+                    found = go.AddComponent<PoolManager>();
+                }
+                return found;
             }
-            return found;
         }
-    }
 
-    private readonly Dictionary<GameObject, ObjectPool> pools = new Dictionary<GameObject, ObjectPool>();
+        private readonly Dictionary<GameObject, ObjectPool> pools = new Dictionary<GameObject, ObjectPool>();
 
-    public ObjectPool GetPool(GameObject prefab, int size = 10)
-    {
-        if (!pools.TryGetValue(prefab, out ObjectPool pool))
+        public ObjectPool GetPool(GameObject prefab, int size = 10)
         {
-            pool = new ObjectPool(prefab, size, transform);
-            pools.Add(prefab, pool);
-        }
+            if (!pools.TryGetValue(prefab, out ObjectPool pool))
+            {
+                pool = new ObjectPool(prefab, size, transform);
+                pools.Add(prefab, pool);
+            }
 
-        return pool;
+            return pool;
+        }
     }
 }
