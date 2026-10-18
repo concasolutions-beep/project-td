@@ -86,7 +86,7 @@ namespace ProjectTD.Tower
             }
 
             TowerController towerController = towerPrefab.GetComponent<TowerController>();
-            int cost = towerController != null && towerController.data != null ? towerController.data.cost : 0;
+            int cost = towerController != null && towerController.Data != null ? towerController.Data.Cost : 0;
 
             if (GameManager.Instance != null && !GameManager.Instance.TrySpendGold(cost))
             {
