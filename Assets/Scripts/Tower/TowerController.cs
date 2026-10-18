@@ -8,15 +8,23 @@ namespace ProjectTD.Tower
 {
     public class TowerController : PoolableEntity
     {
-        public TowerData data;
+        [SerializeField] private TowerData data;
         public Transform firePoint;
         public LayerMask enemyLayerMask;
 
         private float fireCountdown;
-        private float effectiveRange;
+        private float rangeScale;
         private Transform currentTarget;
         private ContactFilter2D contactFilter;
         private List<Collider2D> targetsBuffer = new List<Collider2D>();
+
+        /// <summary>Asset con i valori base: sola lettura. Per i valori correnti usare <see cref="RuntimeStats"/>.</summary>
+        public TowerData Data => data;
+
+        /// <summary>Statistiche di questa torretta; è l'unico posto dove i poteri possono applicare modificatori.</summary>
+        public TowerRuntimeStats RuntimeStats { get; private set; }
+
+        private float EffectiveRange => RuntimeStats.Range * rangeScale;
 
         void Awake()
         {
@@ -26,16 +34,19 @@ namespace ProjectTD.Tower
             CircleCollider2D col = GetComponent<CircleCollider2D>();
             if (col != null)
             {
-                col.radius = data.range;
+                col.radius = data.Range;
             }
 
-            effectiveRange = data.range * Mathf.Abs(transform.lossyScale.x);
+            rangeScale = Mathf.Abs(transform.lossyScale.x);
+
+            RuntimeStats = new TowerRuntimeStats(data);
         }
 
         protected override void OnSpawned()
         {
             fireCountdown = 0f;
             currentTarget = null;
+            RuntimeStats.ResetModifiers();
         }
 
         protected override void OnDespawned()
@@ -56,7 +67,7 @@ namespace ProjectTD.Tower
             if (fireCountdown <= 0f)
             {
                 Shoot(currentTarget);
-                fireCountdown = 1f / data.fireRate;
+                fireCountdown = 1f / RuntimeStats.FireRate;
             }
 
             fireCountdown -= Time.deltaTime;
@@ -68,13 +79,13 @@ namespace ProjectTD.Tower
                 return false;
 
             float distance = Vector2.Distance(transform.position, target.position);
-            return distance <= effectiveRange;
+            return distance <= EffectiveRange;
         }
 
         Transform FindClosestEnemy()
         {
             targetsBuffer.Clear();
-            Physics2D.OverlapCircle(transform.position, effectiveRange, contactFilter, targetsBuffer);
+            Physics2D.OverlapCircle(transform.position, EffectiveRange, contactFilter, targetsBuffer);
 
             Transform closest = null;
             float closestRemainingDistance = float.MaxValue;
@@ -98,13 +109,13 @@ namespace ProjectTD.Tower
 
         void Shoot(Transform target)
         {
-            ObjectPool pool = PoolManager.Instance.GetPool(data.projectileData.projectilePrefab, 10);
+            ObjectPool pool = PoolManager.Instance.GetPool(data.ProjectileData.projectilePrefab, 10);
 
             GameObject projectileGO = pool.Get();
             projectileGO.transform.position = firePoint.position;
 
             ProjectileController projectile = projectileGO.GetComponent<ProjectileController>();
-            projectile.Init(target);
+            projectile.Init(target, RuntimeStats.Damage);
         }
     }
 }

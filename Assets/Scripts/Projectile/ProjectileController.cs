@@ -9,10 +9,12 @@ namespace ProjectTD.Projectile
         public ProjectileData data;
         private Transform target;
         private float lifetime;
+        private float damage;
 
-        public void Init(Transform targetTransform)
+        public void Init(Transform targetTransform, float damageAmount)
         {
             target = targetTransform;
+            damage = damageAmount;
             lifetime = data.maxLifetime;
         }
 
@@ -56,7 +58,7 @@ namespace ProjectTD.Projectile
                 HealthController health = other.GetComponent<HealthController>();
                 if (health != null)
                 {
-                    health.TakeDamage(data.damage);
+                    health.TakeDamage(damage);
                 }
 
                 ReleaseToPool();
